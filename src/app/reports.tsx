@@ -1,228 +1,334 @@
-import React from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-// 1. IMPORT MODULE EXTERNAL (Modul 1 Subbab 1.1 & 3.2)
-import { Transaction, TransactionType } from "../types/finance";
+import {
+  demoTransactions,
+  getBalance,
+  getTotalExpense,
+  getTotalIncome,
+} from "../data/demoData";
+
 import { formatRupiah } from "../utils/currency";
 
-// 2. ARRAY OF OBJECTS (Modul 1 Subbab 5.5.A)
-const transactionsData: Transaction[] = [
-  { id: "1", title: "Gaji Utama", amount: 4500000, type: "income", category: "Gaji", date: "2026-10-01" },
-  { id: "2", title: "Makan Siang", amount: 150000, type: "expense", category: "Makanan", date: "2026-10-02" },
-  { id: "3", title: "Belanja Bulanan", amount: 400000, type: "expense", category: "Belanja", date: "2026-10-03" },
-  { id: "4", title: "Bensin Motor", amount: 100000, type: "expense", category: "Transportasi", date: "2026-10-04" },
-  { id: "5", title: "Listrik & WiFi", amount: 350000, type: "expense", category: "Tagihan", date: "2026-10-05" },
-];
-
 export default function ReportsScreen() {
-  // 3. CUSTOM FUNCTION & PRIMITIVE LOOP FOR (Modul 1 Subbab 5.3.B & 5.4.C)
-  const calculateTotal = (type: TransactionType): number => {
-    let total = 0;
-    for (let i = 0; i < transactionsData.length; i++) {
-      if (transactionsData[i].type === type) {
-        total += transactionsData[i].amount;
-      }
-    }
-    return total;
-  };
+  // =====================================
+  // DATA DARI SUMBER BERSAMA
+  // =====================================
 
-  const totalIncome = calculateTotal("income");
-  const totalExpense = calculateTotal("expense");
-  const netBalance = totalIncome - totalExpense;
+  const totalIncome = getTotalIncome();
+  const totalExpense = getTotalExpense();
+  const netBalance = getBalance();
 
-  // Mengelompokkan Pengeluaran per Kategori
+  // =====================================
+  // KELOMPOKKAN PENGELUARAN PER KATEGORI
+  // =====================================
+
   const expenseCategories: Record<string, number> = {};
-  for (let i = 0; i < transactionsData.length; i++) {
-    const item = transactionsData[i];
+
+  for (let i = 0; i < demoTransactions.length; i++) {
+    const item = demoTransactions[i];
+
     if (item.type === "expense") {
-      expenseCategories[item.category] = (expenseCategories[item.category] || 0) + item.amount;
+      expenseCategories[item.category] =
+        (expenseCategories[item.category] || 0) + item.amount;
     }
   }
 
-  const categoryEntries = Object.entries(expenseCategories).sort(([, a], [, b]) => b - a);
+  const categoryEntries = Object.entries(expenseCategories).sort(
+    ([, a], [, b]) => b - a,
+  );
 
-  // CUSTOM FUNCTION UNTUK RENDER CARD (Modul 1 Subbab 5.3.B)
-  const renderCategoryCard = (category: string, amount: number, index: number) => {
-    const percentage = totalExpense > 0 ? Math.round((amount / totalExpense) * 100) : 0;
+  // =====================================
+  // RENDER CARD KATEGORI
+  // =====================================
+
+  const renderCategoryCard = (
+    category: string,
+    amount: number,
+    index: number,
+  ) => {
+    const percentage =
+      totalExpense > 0 ? Math.round((amount / totalExpense) * 100) : 0;
 
     return (
-      <View key={index} style={styles.categoryCard}>
+      <View key={`${category}-${index}`} style={styles.categoryCard}>
         <View style={styles.categoryHeader}>
           <View style={styles.categoryTitleGroup}>
             <Ionicons name="pie-chart-outline" size={18} color="#15803D" />
+
             <Text style={styles.categoryName}>{category}</Text>
           </View>
+
           <Text style={styles.categoryAmount}>
-            {formatRupiah(amount)}{" "}
-            {/* INLINE STYLING (Modul 1 Subbab 3.3) */}
-            <Text style={{ fontSize: 12, color: "#64748B" }}>({percentage}%)</Text>
+            {formatRupiah(amount)}
+
+            <Text style={styles.percentageText}> ({percentage}%)</Text>
           </Text>
         </View>
 
-        {/* Progress Bar Indikator Visual */}
+        {/* PROGRESS BAR */}
         <View style={styles.progressBackground}>
-          <View style={[styles.progressFill, { width: `${Math.min(percentage, 100)}%` }]} />
+          <View
+            style={[
+              styles.progressFill,
+              {
+                width: `${Math.min(percentage, 100)}%`,
+              },
+            ]}
+          />
         </View>
       </View>
     );
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Header Judul */}
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* =====================================
+          HEADER
+      ===================================== */}
+
       <View style={styles.headerArea}>
         <Ionicons name="stats-chart" size={24} color="#15803D" />
+
         <Text style={styles.headerTitle}>Statistik Keuangan</Text>
       </View>
 
-      {/* Banner Utama Saldo */}
+      {/* =====================================
+          BANNER SALDO
+      ===================================== */}
+
       <View style={styles.bannerCard}>
-        <Text style={styles.bannerLabel}>Total Saldo Saat Ini (Selisih)</Text>
-        {/* INLINE STYLING (Modul 1 Subbab 3.3) */}
-        <Text style={{ fontSize: 26, fontWeight: "bold", color: "#FFFFFF", marginVertical: 4 }}>
-          {formatRupiah(netBalance)}
-        </Text>
-        <Text style={{ fontSize: 12, color: "#DCFCE7" }}>
-          {netBalance >= 0 ? "Kondisi Keuangan Stabil" : "Pengeluaran Melebihi Pemasukan"}
+        <Text style={styles.bannerLabel}>Total Saldo Saat Ini</Text>
+
+        <Text style={styles.bannerAmount}>{formatRupiah(netBalance)}</Text>
+
+        <Text style={styles.bannerDescription}>
+          {netBalance >= 0
+            ? "Kondisi Keuangan Stabil"
+            : "Pengeluaran Melebihi Pemasukan"}
         </Text>
       </View>
 
-      {/* Grid Kartu Pemasukan & Pengeluaran */}
+      {/* =====================================
+          PEMASUKAN & PENGELUARAN
+      ===================================== */}
+
       <View style={styles.statsGrid}>
         <View style={styles.statCard}>
           <View style={styles.statHeader}>
             <Ionicons name="arrow-up-circle" size={20} color="#15803D" />
+
             <Text style={styles.statLabel}>Pemasukan</Text>
           </View>
-          {/* INLINE STYLING (Modul 1 Subbab 3.3) */}
-          <Text style={{ fontSize: 15, fontWeight: "bold", color: "#15803D" }}>
-            {formatRupiah(totalIncome)}
-          </Text>
+
+          <Text style={styles.incomeValue}>{formatRupiah(totalIncome)}</Text>
         </View>
 
         <View style={styles.statCard}>
           <View style={styles.statHeader}>
             <Ionicons name="arrow-down-circle" size={20} color="#DC2626" />
+
             <Text style={styles.statLabel}>Pengeluaran</Text>
           </View>
-          {/* INLINE STYLING (Modul 1 Subbab 3.3) - PERBAIKAN DI BARIS INI */}
-          <Text style={{ fontSize: 15, fontWeight: "bold", color: "#DC2626" }}>
-            {formatRupiah(totalExpense)}
-          </Text>
+
+          <Text style={styles.expenseValue}>{formatRupiah(totalExpense)}</Text>
         </View>
       </View>
 
-      {/* Section Pengeluaran per Kategori */}
+      {/* =====================================
+          PENGELUARAN PER KATEGORI
+      ===================================== */}
+
       <Text style={styles.sectionTitle}>Pengeluaran per Kategori</Text>
 
-      {/* 4. LOOP .MAP() (Modul 1 Subbab 5.4.A) */}
       <View style={styles.categoryList}>
         {categoryEntries.map(([category, amount], index) =>
-          renderCategoryCard(category, amount, index)
+          renderCategoryCard(category, amount, index),
         )}
       </View>
     </ScrollView>
   );
 }
 
-// 5. INTERNAL / EXTERNAL STYLING (Modul 1 Subbab 3.1 & 3.2)
+// =========================================
+// STYLES
+// =========================================
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F8FAFC",
   },
+
   content: {
     padding: 20,
+    paddingBottom: 32,
   },
+
+  // =======================================
+  // HEADER
+  // =======================================
+
   headerArea: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
     marginBottom: 16,
   },
+
   headerTitle: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#0F172A",
   },
+
+  // =======================================
+  // BANNER
+  // =======================================
+
   bannerCard: {
     backgroundColor: "#15803D",
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 20,
     marginBottom: 16,
   },
+
   bannerLabel: {
     fontSize: 12,
     color: "#DCFCE7",
   },
+
+  bannerAmount: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    marginVertical: 4,
+  },
+
+  bannerDescription: {
+    fontSize: 12,
+    color: "#DCFCE7",
+  },
+
+  // =======================================
+  // STATISTIC CARD
+  // =======================================
+
   statsGrid: {
     flexDirection: "row",
     gap: 12,
     marginBottom: 20,
   },
+
   statCard: {
     flex: 1,
     backgroundColor: "#FFFFFF",
+
     padding: 16,
-    borderRadius: 12,
+
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: "#E2E8F0",
   },
+
   statHeader: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     marginBottom: 6,
   },
+
   statLabel: {
     fontSize: 12,
     color: "#64748B",
   },
+
+  incomeValue: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#15803D",
+  },
+
+  expenseValue: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#DC2626",
+  },
+
+  // =======================================
+  // CATEGORY
+  // =======================================
+
   sectionTitle: {
     fontSize: 16,
     fontWeight: "bold",
     color: "#0F172A",
     marginBottom: 12,
   },
+
   categoryList: {
     gap: 12,
     paddingBottom: 24,
   },
+
   categoryCard: {
     backgroundColor: "#FFFFFF",
+
     padding: 16,
-    borderRadius: 12,
+
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: "#E2E8F0",
+
     gap: 10,
   },
+
   categoryHeader: {
     flexDirection: "row",
-    justifycontent: "space-between",
+    justifyContent: "space-between",
     alignItems: "center",
   },
+
   categoryTitleGroup: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+    flex: 1,
   },
+
   categoryName: {
     fontSize: 14,
     fontWeight: "600",
     color: "#0F172A",
   },
+
   categoryAmount: {
     fontSize: 14,
     fontWeight: "600",
     color: "#0F172A",
   },
+
+  percentageText: {
+    fontSize: 12,
+    color: "#64748B",
+    fontWeight: "400",
+  },
+
+  // =======================================
+  // PROGRESS BAR
+  // =======================================
+
   progressBackground: {
     height: 6,
     backgroundColor: "#F1F5F9",
     borderRadius: 3,
     overflow: "hidden",
   },
+
   progressFill: {
     height: "100%",
     backgroundColor: "#15803D",

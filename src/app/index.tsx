@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import {
   Image,
@@ -10,43 +11,23 @@ import {
   View,
 } from "react-native";
 
+import {
+  demoTransactions,
+  getBalance,
+  getTotalExpense,
+  getTotalIncome,
+} from "../data/demoData";
+
 export default function HomeScreen() {
   const [showBalance, setShowBalance] = useState(true);
 
   // =====================================
-  // DATA SEMENTARA
+  // DATA DARI SUMBER BERSAMA
   // =====================================
 
-  const income = 4000000;
-  const expense = 1500000;
-  const balance = income - expense;
-
-  const transactions = [
-    {
-      id: 1,
-      title: "Makan",
-      category: "Makanan",
-      amount: -25000,
-    },
-    {
-      id: 2,
-      title: "Gaji",
-      category: "Pendapatan",
-      amount: 2000000,
-    },
-    {
-      id: 3,
-      title: "Belanja",
-      category: "Kebutuhan",
-      amount: -150000,
-    },
-    {
-      id: 4,
-      title: "Transportasi",
-      category: "Transportasi",
-      amount: -50000,
-    },
-  ];
+  const income = getTotalIncome();
+  const expense = getTotalExpense();
+  const balance = getBalance();
 
   // =====================================
   // FORMAT RUPIAH
@@ -62,10 +43,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor="#F8FAFC"
-      />
+      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -82,13 +60,8 @@ export default function HomeScreen() {
             resizeMode="contain"
           />
 
-          <Pressable
-            style={styles.profileButton}
-            onPress={() => {}}
-          >
-            <Text style={styles.profileText}>
-              👤
-            </Text>
+          <Pressable style={styles.profileButton} onPress={() => {}}>
+            <Text style={styles.profileText}>👤</Text>
           </Pressable>
         </View>
 
@@ -97,9 +70,7 @@ export default function HomeScreen() {
         ===================================== */}
 
         <View style={styles.greeting}>
-          <Text style={styles.greetingSmall}>
-            Selamat datang 
-          </Text>
+          <Text style={styles.greetingSmall}>Selamat datang</Text>
 
           <Text style={styles.greetingTitle}>
             Kelola keuanganmu dengan Budgetin
@@ -112,30 +83,18 @@ export default function HomeScreen() {
 
         <View style={styles.balanceCard}>
           <View style={styles.balanceHeader}>
-            <Text style={styles.balanceLabel}>
-              Total Saldo
-            </Text>
+            <Text style={styles.balanceLabel}>Total Saldo</Text>
 
-            <Pressable
-              onPress={() =>
-                setShowBalance(!showBalance)
-              }
-            >
-              <Text style={styles.eye}>
-                {showBalance ? "👁" : "🙈"}
-              </Text>
+            <Pressable onPress={() => setShowBalance(!showBalance)}>
+              <Text style={styles.eye}>{showBalance ? "👁" : "🙈"}</Text>
             </Pressable>
           </View>
 
           <Text style={styles.balanceAmount}>
-            {showBalance
-              ? formatRupiah(balance)
-              : "Rp •••••••"}
+            {showBalance ? formatRupiah(balance) : "Rp •••••••"}
           </Text>
 
-          <Text style={styles.balanceDescription}>
-            Saldo saat ini
-          </Text>
+          <Text style={styles.balanceDescription}>Saldo saat ini</Text>
         </View>
 
         {/* =====================================
@@ -145,34 +104,22 @@ export default function HomeScreen() {
         <View style={styles.summaryRow}>
           <View style={styles.summaryCard}>
             <View style={styles.summaryIconIncome}>
-              <Text style={styles.incomeIconText}>
-                ↗
-              </Text>
+              <Text style={styles.incomeIconText}>↗</Text>
             </View>
 
-            <Text style={styles.summaryLabel}>
-              Pemasukan
-            </Text>
+            <Text style={styles.summaryLabel}>Pemasukan</Text>
 
-            <Text style={styles.incomeAmount}>
-              {formatRupiah(income)}
-            </Text>
+            <Text style={styles.incomeAmount}>{formatRupiah(income)}</Text>
           </View>
 
           <View style={styles.summaryCard}>
             <View style={styles.summaryIconExpense}>
-              <Text style={styles.expenseIconText}>
-                ↘
-              </Text>
+              <Text style={styles.expenseIconText}>↘</Text>
             </View>
 
-            <Text style={styles.summaryLabel}>
-              Pengeluaran
-            </Text>
+            <Text style={styles.summaryLabel}>Pengeluaran</Text>
 
-            <Text style={styles.expenseAmount}>
-              {formatRupiah(expense)}
-            </Text>
+            <Text style={styles.expenseAmount}>{formatRupiah(expense)}</Text>
           </View>
         </View>
 
@@ -181,172 +128,100 @@ export default function HomeScreen() {
         ===================================== */}
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>
-            Transaksi Terbaru
-          </Text>
+          <Text style={styles.sectionTitle}>Transaksi Terbaru</Text>
 
-          <Pressable onPress={() => {}}>
-            <Text style={styles.seeAll}>
-              Lihat semua
-            </Text>
+          <Pressable onPress={() => router.push("/transactions")}>
+            <Text style={styles.seeAll}>Lihat semua</Text>
           </Pressable>
         </View>
 
         <View style={styles.transactionContainer}>
-          {transactions.map(
-            (transaction, index) => {
-              const isIncome =
-                transaction.amount > 0;
+          {demoTransactions.map((transaction, index) => {
+            const isIncome = transaction.type === "income";
 
-              return (
-                <View
-                  key={transaction.id}
-                  style={[
-                    styles.transactionItem,
-                    index ===
-                      transactions.length - 1 &&
-                      styles.lastTransaction,
-                  ]}
-                >
-                  <View style={styles.transactionLeft}>
-                    <View
-                      style={[
-                        styles.transactionIcon,
-                        isIncome
-                          ? styles.incomeIcon
-                          : styles.expenseIcon,
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.transactionIconText,
-                          isIncome
-                            ? styles.incomeIconText
-                            : styles.expenseIconText,
-                        ]}
-                      >
-                        {isIncome ? "↗" : "↘"}
-                      </Text>
-                    </View>
-
-                    <View>
-                      <Text
-                        style={styles.transactionTitle}
-                      >
-                        {transaction.title}
-                      </Text>
-
-                      <Text
-                        style={
-                          styles.transactionCategory
-                        }
-                      >
-                        {transaction.category}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <Text
+            return (
+              <View
+                key={transaction.id}
+                style={[
+                  styles.transactionItem,
+                  index === demoTransactions.length - 1 &&
+                    styles.lastTransaction,
+                ]}
+              >
+                <View style={styles.transactionLeft}>
+                  <View
                     style={[
-                      styles.transactionAmount,
-                      isIncome
-                        ? styles.incomeText
-                        : styles.expenseText,
+                      styles.transactionIcon,
+                      isIncome ? styles.incomeIcon : styles.expenseIcon,
                     ]}
                   >
-                    {isIncome ? "+" : "-"}
-                    {formatRupiah(
-                      transaction.amount
-                    )}
-                  </Text>
+                    <Text
+                      style={[
+                        styles.transactionIconText,
+                        isIncome
+                          ? styles.incomeIconText
+                          : styles.expenseIconText,
+                      ]}
+                    >
+                      {isIncome ? "↗" : "↘"}
+                    </Text>
+                  </View>
+
+                  <View>
+                    <Text style={styles.transactionTitle}>
+                      {transaction.title}
+                    </Text>
+
+                    <Text style={styles.transactionCategory}>
+                      {transaction.category}
+                    </Text>
+                  </View>
                 </View>
-              );
-            }
-          )}
+
+                <Text
+                  style={[
+                    styles.transactionAmount,
+                    isIncome ? styles.incomeText : styles.expenseText,
+                  ]}
+                >
+                  {isIncome ? "+" : "-"}
+                  {formatRupiah(transaction.amount)}
+                </Text>
+              </View>
+            );
+          })}
         </View>
 
         {/* =====================================
             AKSES CEPAT
         ===================================== */}
 
-        <Text style={styles.sectionTitle}>
-          Akses Cepat
-        </Text>
+        <Text style={styles.sectionTitle}>Akses Cepat</Text>
 
         <View style={styles.quickActionRow}>
           <Pressable
             style={styles.quickAction}
-            onPress={() => {}}
+            onPress={() => router.push("/transactions")}
           >
             <View style={styles.quickIconContainer}>
-              <Text style={styles.quickIcon}>
-                ＋
-              </Text>
+              <Text style={styles.quickIcon}>＋</Text>
             </View>
 
-            <Text style={styles.quickText}>
-              Tambah Transaksi
-            </Text>
+            <Text style={styles.quickText}>Lihat Transaksi</Text>
           </Pressable>
 
           <Pressable
             style={styles.quickAction}
-            onPress={() => {}}
+            onPress={() => router.push("/reports")}
           >
             <View style={styles.quickIconContainer}>
-              <Text style={styles.quickIcon}>
-                📊
-              </Text>
+              <Text style={styles.quickIcon}>📊</Text>
             </View>
 
-            <Text style={styles.quickText}>
-              Lihat Statistik
-            </Text>
+            <Text style={styles.quickText}>Lihat Statistik</Text>
           </Pressable>
         </View>
       </ScrollView>
-
-      {/* =====================================
-          BOTTOM NAVIGATION
-      ===================================== */}
-
-      <View style={styles.bottomNavigation}>
-        <Pressable style={styles.navItem}>
-          <Text style={styles.navIconActive}>
-            ⌂
-          </Text>
-
-          <Text style={styles.navTextActive}>
-            Beranda
-          </Text>
-        </Pressable>
-
-        <Pressable
-          style={styles.navItem}
-          onPress={() => {}}
-        >
-          <Text style={styles.navIcon}>
-            ▣
-          </Text>
-
-          <Text style={styles.navText}>
-            Transaksi
-          </Text>
-        </Pressable>
-
-        <Pressable
-          style={styles.navItem}
-          onPress={() => {}}
-        >
-          <Text style={styles.navIcon}>
-            ▥
-          </Text>
-
-          <Text style={styles.navText}>
-            Statistik
-          </Text>
-        </Pressable>
-      </View>
     </SafeAreaView>
   );
 }
@@ -373,7 +248,7 @@ const styles = StyleSheet.create({
   header: {
     height: 150,
     marginTop: 15,
-    marginLeft:9,
+    marginLeft: 9,
     marginRight: 9,
 
     flexDirection: "row",
@@ -488,8 +363,10 @@ const styles = StyleSheet.create({
     height: 38,
     borderRadius: 19,
     backgroundColor: "#DCFCE7",
+
     alignItems: "center",
     justifyContent: "center",
+
     marginBottom: 10,
   },
 
@@ -498,8 +375,10 @@ const styles = StyleSheet.create({
     height: 38,
     borderRadius: 19,
     backgroundColor: "#FEE2E2",
+
     alignItems: "center",
     justifyContent: "center",
+
     marginBottom: 10,
   },
 
@@ -566,16 +445,20 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 16,
     marginBottom: 28,
+
     borderWidth: 1,
     borderColor: "#E2E8F0",
+
     overflow: "hidden",
   },
 
   transactionItem: {
     minHeight: 72,
+
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+
     borderBottomWidth: 1,
     borderBottomColor: "#E2E8F0",
   },
@@ -594,8 +477,10 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
+
     alignItems: "center",
     justifyContent: "center",
+
     marginRight: 12,
   },
 
@@ -651,7 +536,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 18,
+
     alignItems: "center",
+
     borderWidth: 1,
     borderColor: "#E2E8F0",
   },
@@ -660,9 +547,12 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
+
     backgroundColor: "#DCFCE7",
+
     alignItems: "center",
     justifyContent: "center",
+
     marginBottom: 8,
   },
 
@@ -680,23 +570,6 @@ const styles = StyleSheet.create({
   // =======================================
   // BOTTOM NAVIGATION
   // =======================================
-
-  bottomNavigation: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 75,
-
-    backgroundColor: "#FFFFFF",
-
-    borderTopWidth: 1,
-    borderTopColor: "#E2E8F0",
-
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-  },
 
   navItem: {
     alignItems: "center",
