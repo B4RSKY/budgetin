@@ -1,4 +1,4 @@
-import type { Transaction } from "../types/finance";
+import type { Budget, DemoProfile, Transaction } from "../types/finance";
 
 export const demoTransactions: Transaction[] = [
   {
@@ -34,6 +34,26 @@ export const demoTransactions: Transaction[] = [
     date: "2026-10-04",
   },
 ];
+
+export const demoBudgets: Budget[] = [
+  {
+    id: "budget-001",
+    category: "Makanan",
+    limit: 600000,
+    spent: 250000,
+  },
+  {
+    id: "budget-002",
+    category: "Transportasi",
+    limit: 300000,
+    spent: 90000,
+  },
+];
+
+export const demoProfile: DemoProfile = {
+  displayName: "Pengguna Budgetin",
+  email: "demo@budgetin.local",
+};
 
 export function getTotalIncome(): number {
   let total = 0;
