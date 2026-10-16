@@ -1,75 +1,40 @@
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from 'react-native';
+import { transactionStyles as styles } from '../styles/transactionStyles';
+import type { Transaction } from '../types/finance';
 
-import { transactionStyles as styles } from "../styles/transactionStyles";
-import type { Transaction } from "../types/finance";
-
-interface TransactionItemProps {
-  transaction: Transaction;
+export function formatTanggal(date: string): string {
+  const [year, month, day] = date.split('-');
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  return `${Number(day)} ${months[Number(month) - 1] ?? ''} ${year}`;
 }
 
-function formatTanggal(date: string): string {
-  const [year, month, day] = date.split("-");
-
-  const namaBulan = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "Mei",
-    "Jun",
-    "Jul",
-    "Agu",
-    "Sep",
-    "Okt",
-    "Nov",
-    "Des",
-  ];
-
-  return `${Number(day)} ${namaBulan[Number(month) - 1]} ${year}`;
+export function formatRupiah(amount: number): string {
+  return `Rp${new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(amount)}`;
 }
 
-function formatRupiah(amount: number): string {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+interface Props { transaction: Transaction; onPress?: () => void }
 
-export default function TransactionItem({ transaction }: TransactionItemProps) {
-  const isIncome = transaction.type === "income";
-
+export default function TransactionItem({ transaction, onPress }: Props) {
+  const income = transaction.type === 'income';
   return (
-    <View style={styles.transactionCard}>
+    <Pressable onPress={onPress} disabled={!onPress} accessibilityRole={onPress ? 'button' : undefined}
+      accessibilityLabel={`Detail transaksi ${transaction.title}`}
+      style={({ pressed }) => [styles.transactionCard, pressed && { opacity: 0.75 }]}>
       <View style={styles.transactionTop}>
-        <View>
+        <View style={styles.transactionInfo}>
           <Text style={styles.transactionTitle}>{transaction.title}</Text>
-
           <Text style={styles.transactionCategory}>{transaction.category}</Text>
-
-          {/* INLINE STYLING */}
-          <Text
-            style={{
-              marginTop: 4,
-            }}
-          >
-            {formatTanggal(transaction.date)}
+          <Text style={styles.transactionDate}>{formatTanggal(transaction.date)}</Text>
+        </View>
+        <View style={styles.amountBox}>
+          <Text style={income ? styles.incomeAmount : styles.expenseAmount}>
+            {income ? '+' : '−'}{formatRupiah(transaction.amount)}
+          </Text>
+          <Text style={[styles.typeLabel, income ? styles.incomeLabel : styles.expenseLabel]}>
+            {income ? 'Pemasukan' : 'Pengeluaran'}
           </Text>
         </View>
-
-        <Text style={isIncome ? styles.incomeAmount : styles.expenseAmount}>
-          {isIncome ? "+" : "−"} {formatRupiah(transaction.amount)}
-        </Text>
       </View>
-
-      <Text
-        style={[
-          styles.typeLabel,
-          isIncome ? styles.incomeLabel : styles.expenseLabel,
-        ]}
-      >
-        {isIncome ? "Pemasukan" : "Pengeluaran"}
-      </Text>
-    </View>
+    </Pressable>
   );
 }
