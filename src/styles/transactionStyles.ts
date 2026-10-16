@@ -2,41 +2,6 @@ import { StyleSheet } from "react-native";
 import { colors, radius, spacing } from "../constants/theme";
 
 export const transactionStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F8FAFC",
-  },
-
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 12,
-  },
-
-  tombolNew: {
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#111827",
-  },
-
-  foot: {
-    fontSize: 28,
-    fontWeight: "700",
-    margin: 12,
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#111827",
-  },
-
-  subtitle: {
-    marginTop: 4,
-    fontSize: 14,
-    color: "#6B7280",
-  },
-
   container: { flex: 1, backgroundColor: colors.background },
   listContainer: {
     paddingHorizontal: spacing.lg,
