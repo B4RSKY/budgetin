@@ -12,6 +12,18 @@ export const transactionStyles = StyleSheet.create({
     paddingBottom: 12,
   },
 
+  tombolNew: {
+    alignItems: "center",
+    justifyContent: "center",
+    color: "#111827",
+  },
+
+  foot: {
+    fontSize: 28,
+    fontWeight: "700",
+    margin: 12,
+  },
+
   title: {
     fontSize: 28,
     fontWeight: "700",

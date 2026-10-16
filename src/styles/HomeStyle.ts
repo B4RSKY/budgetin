@@ -1,10 +1,7 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-  // =====================================
-  // CONTAINER
-  // =====================================
-
+  //Container
   container: {
     flex: 1,
     backgroundColor: "#F8FAFC",
@@ -15,10 +12,7 @@ export const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 
-  // =====================================
-  // HEADER
-  // =====================================
-
+  //Header
   header: {
     height: 90,
     marginTop: 18,
@@ -51,10 +45,7 @@ export const styles = StyleSheet.create({
     marginRight: 5,
   },
 
-  // =====================================
-  // GREETING
-  // =====================================
-
+  //Greateing
   greeting: {
     marginTop: 2,
     marginBottom: 20,
@@ -73,10 +64,7 @@ export const styles = StyleSheet.create({
     lineHeight: 30,
   },
 
-  // =====================================
-  // BALANCE
-  // =====================================
-
+  //Balance
   balanceCard: {
     backgroundColor: "#15803D",
     borderRadius: 20,
@@ -108,10 +96,7 @@ export const styles = StyleSheet.create({
     marginTop: 6,
   },
 
-  // =====================================
-  // SUMMARY
-  // =====================================
-
+  //Summary
   summaryRow: {
     flexDirection: "row",
     gap: 12,
@@ -172,10 +157,7 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  // =====================================
-  // SECTION
-  // =====================================
-
+  //Section
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -197,10 +179,7 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  // =====================================
-  // TRANSACTION
-  // =====================================
-
+  //Transaction
   transactionContainer: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
@@ -279,10 +258,7 @@ export const styles = StyleSheet.create({
     color: "#DC2626",
   },
 
-  // =====================================
-  // QUICK ACTION
-  // =====================================
-
+  //Quick Action
   quickActionRow: {
     flexDirection: "row",
     gap: 12,
