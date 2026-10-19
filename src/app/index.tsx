@@ -1,6 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
   Image,
   Pressable,
   SafeAreaView,
@@ -11,6 +13,7 @@ import {
 } from "react-native";
 
 import {
+  demoProfile,
   demoTransactions,
   getBalance,
   getTotalExpense,
@@ -22,23 +25,16 @@ import { styles } from "../styles/HomeStyle";
 export default function HomeScreen() {
   const [showBalance, setShowBalance] = useState(true);
 
-  // =====================================
-  // DATA DARI DEMO DATA BERSAMA
-  // =====================================
-
   const income = getTotalIncome();
   const expense = getTotalExpense();
   const balance = getBalance();
-
-  // =====================================
-  // FORMAT RUPIAH
-  // =====================================
 
   const formatRupiah = (number: number) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(Math.abs(number));
   };
 
@@ -53,10 +49,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* =====================================
-            HEADER
-        ===================================== */}
-
+        {/* HEADER */}
         <View style={styles.header}>
           <Image
             source={require("../../assets/images/budgetin-logo.png")}
@@ -66,7 +59,12 @@ export default function HomeScreen() {
 
           <Pressable
             style={styles.profileButton}
-            onPress={() => {}}
+            onPress={() =>
+              Alert.alert(
+                "Profil Budgetin",
+                `${demoProfile.displayName}\n${demoProfile.email}`
+              )
+            }
           >
             <Ionicons
               name="person-outline"
@@ -76,10 +74,7 @@ export default function HomeScreen() {
           </Pressable>
         </View>
 
-        {/* =====================================
-            GREETING
-        ===================================== */}
-
+        {/* GREETING */}
         <View style={styles.greeting}>
           <Text style={styles.greetingSmall}>
             Selamat datang 👋
@@ -90,10 +85,7 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {/* =====================================
-            BALANCE
-        ===================================== */}
-
+        {/* TOTAL SALDO */}
         <View style={styles.balanceCard}>
           <View style={styles.balanceHeader}>
             <Text style={styles.balanceLabel}>
@@ -102,7 +94,7 @@ export default function HomeScreen() {
 
             <Pressable
               onPress={() =>
-                setShowBalance(!showBalance)
+                setShowBalance((previous) => !previous)
               }
             >
               <Ionicons
@@ -128,13 +120,8 @@ export default function HomeScreen() {
           </Text>
         </View>
 
-        {/* =====================================
-            PEMASUKAN & PENGELUARAN
-        ===================================== */}
-
+        {/* PEMASUKAN DAN PENGELUARAN */}
         <View style={styles.summaryRow}>
-          {/* PEMASUKAN */}
-
           <View style={styles.summaryCard}>
             <View style={styles.summaryIconIncome}>
               <Ionicons
@@ -152,8 +139,6 @@ export default function HomeScreen() {
               {formatRupiah(income)}
             </Text>
           </View>
-
-          {/* PENGELUARAN */}
 
           <View style={styles.summaryCard}>
             <View style={styles.summaryIconExpense}>
@@ -174,16 +159,15 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* =====================================
-            TRANSAKSI TERBARU
-        ===================================== */}
-
+        {/* TRANSAKSI TERBARU */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>
             Transaksi Terbaru
           </Text>
 
-          <Pressable onPress={() => {}}>
+          <Pressable
+            onPress={() => router.push("/transactions")}
+          >
             <Text style={styles.seeAll}>
               Lihat semua
             </Text>
@@ -191,23 +175,19 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.transactionContainer}>
-          {demoTransactions.map(
-            (transaction, index) => {
-              const isIncome =
-                transaction.type === "income";
+          {demoTransactions.length > 0 ? (
+            demoTransactions.map((transaction, index) => {
+              const isIncome = transaction.type === "income";
 
               return (
                 <View
                   key={transaction.id}
                   style={[
                     styles.transactionItem,
-                    index ===
-                      demoTransactions.length - 1 &&
+                    index === demoTransactions.length - 1 &&
                       styles.lastTransaction,
                   ]}
                 >
-                  {/* ICON + DATA TRANSAKSI */}
-
                   <View style={styles.transactionLeft}>
                     <View
                       style={[
@@ -225,31 +205,21 @@ export default function HomeScreen() {
                         }
                         size={19}
                         color={
-                          isIncome
-                            ? "#15803D"
-                            : "#DC2626"
+                          isIncome ? "#15803D" : "#DC2626"
                         }
                       />
                     </View>
 
                     <View>
-                      <Text
-                        style={styles.transactionTitle}
-                      >
+                      <Text style={styles.transactionTitle}>
                         {transaction.title}
                       </Text>
 
-                      <Text
-                        style={
-                          styles.transactionCategory
-                        }
-                      >
+                      <Text style={styles.transactionCategory}>
                         {transaction.category}
                       </Text>
                     </View>
                   </View>
-
-                  {/* NOMINAL */}
 
                   <Text
                     style={[
@@ -260,30 +230,27 @@ export default function HomeScreen() {
                     ]}
                   >
                     {isIncome ? "+" : "-"}
-                    {formatRupiah(
-                      transaction.amount
-                    )}
+                    {formatRupiah(transaction.amount)}
                   </Text>
                 </View>
               );
-            }
+            })
+          ) : (
+            <Text style={styles.transactionCategory}>
+              Belum ada transaksi.
+            </Text>
           )}
         </View>
 
-        {/* =====================================
-            AKSES CEPAT
-        ===================================== */}
-
+        {/* AKSES CEPAT */}
         <Text style={styles.sectionTitle}>
           Akses Cepat
         </Text>
 
         <View style={styles.quickActionRow}>
-          {/* TAMBAH TRANSAKSI */}
-
           <Pressable
             style={styles.quickAction}
-            onPress={() => {}}
+            onPress={() => router.push("/transactions")}
           >
             <View style={styles.quickIconContainer}>
               <Ionicons
@@ -298,11 +265,9 @@ export default function HomeScreen() {
             </Text>
           </Pressable>
 
-          {/* STATISTIK */}
-
           <Pressable
             style={styles.quickAction}
-            onPress={() => {}}
+            onPress={() => router.push("/reports")}
           >
             <View style={styles.quickIconContainer}>
               <Ionicons

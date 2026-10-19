@@ -22,7 +22,7 @@ export default function TransactionsScreen() {
     setVisibleTransactions(
       filter === "all"
         ? demoTransactions
-        : demoTransactions.filter((item) => item.type === filter),
+        : demoTransactions.filter((item) => item.type === "income"),
     );
   }, [filter]);
 
