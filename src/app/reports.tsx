@@ -1,30 +1,46 @@
-import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { useState, useEffect } from "react";
+import { ScrollView, Text, View, TouchableOpacity, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter, useLocalSearchParams } from "expo-router";
 
-// 1. IMPORT DATA & UTILS
-import {
-  demoTransactions,
-  getBalance,
-  getTotalExpense,
-  getTotalIncome,
-} from "../data/demoData";
+import { demoTransactions } from "../data/demoData";
 import { formatRupiah } from "../utils/currency";
-
-// 2. IMPORT EXTERNAL STYLES (Modul 1 Subbab 3.2)
 import { styles } from "../styles/reportsStyles";
 
 export default function ReportsScreen() {
-  const totalIncome = getTotalIncome();
-  const totalExpense = getTotalExpense();
-  const netBalance = getBalance();
+  const router = useRouter();
+  const params = useLocalSearchParams();
+
+  const [selectedPeriod, setSelectedPeriod] = useState<"all" | "month" | "week">("all");
+  const [incomeTotal, setIncomeTotal] = useState<number>(0);
+  const [expenseTotal, setExpenseTotal] = useState<number>(0);
+  const [filteredList, setFilteredList] = useState(demoTransactions);
+
+  useEffect(() => {
+    const filtered = demoTransactions.filter((item) => {
+      if (selectedPeriod === "week") return item.date >= "2026-10-03";
+      if (selectedPeriod === "month") return item.date >= "2026-10-01";
+      return true;
+    });
+
+    let income = 0;
+    let expense = 0;
+
+    filtered.forEach((item) => {
+      if (item.type === "income") income += item.amount;
+      if (item.type === "expense") expense += item.amount;
+    });
+
+    setIncomeTotal(income);
+    setExpenseTotal(expense);
+    setFilteredList(filtered);
+  }, [selectedPeriod]);
+
+  const netBalance = incomeTotal - expenseTotal;
 
   const expenseCategories: Record<string, number> = {};
-
-  // PRIMITIVE LOOP FOR (Modul 1 Subbab 5.4.C)
-  for (let i = 0; i < demoTransactions.length; i++) {
-    const item = demoTransactions[i];
-
+  for (let i = 0; i < filteredList.length; i++) {
+    const item = filteredList[i];
     if (item.type === "expense") {
       expenseCategories[item.category] =
         (expenseCategories[item.category] || 0) + item.amount;
@@ -32,17 +48,24 @@ export default function ReportsScreen() {
   }
 
   const categoryEntries = Object.entries(expenseCategories).sort(
-    ([, a], [, b]) => b - a,
+    ([, a], [, b]) => b - a
   );
 
-  // CUSTOM FUNCTION (Modul 1 Subbab 5.3.B)
-  const renderCategoryCard = (
-    category: string,
-    amount: number,
-    index: number,
-  ) => {
+  const handleGoBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
+  };
+
+  const handleOpenTransactions = () => {
+    router.push("/transactions");
+  };
+
+  const renderCategoryCard = (category: string, amount: number, index: number) => {
     const percentage =
-      totalExpense > 0 ? Math.round((amount / totalExpense) * 100) : 0;
+      expenseTotal > 0 ? Math.round((amount / expenseTotal) * 100) : 0;
 
     return (
       <View key={`${category}-${index}`} style={styles.categoryCard}>
@@ -54,22 +77,15 @@ export default function ReportsScreen() {
 
           <Text style={styles.categoryAmount}>
             {formatRupiah(amount)}
-            {/* INLINE STYLING (Modul 1 Subbab 3.3) tetap dipertahankan untuk nilai demo */}
-            <Text style={{ fontSize: 12, color: "#64748B", fontWeight: "400" }}>
-              {" "}
-              ({percentage}%)
-            </Text>
+            <Text style={styles.percentageText}> ({percentage}%)</Text>
           </Text>
         </View>
 
-        {/* PROGRESS BAR (INLINE STYLING) */}
         <View style={styles.progressBackground}>
           <View
             style={[
               styles.progressFill,
-              {
-                width: `${Math.min(percentage, 100)}%`,
-              },
+              { width: `${Math.min(percentage, 100)}%` },
             ]}
           />
         </View>
@@ -83,31 +99,63 @@ export default function ReportsScreen() {
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
     >
-      {/* HEADER */}
       <View style={styles.headerArea}>
-        <Ionicons name="stats-chart" size={24} color="#15803D" />
-        <Text style={styles.headerTitle}>Statistik Keuangan</Text>
+        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+          <Ionicons name="arrow-back" size={20} color="#0F172A" />
+        </TouchableOpacity>
+
+        <View style={styles.headerTitleGroup}>
+          <Ionicons name="stats-chart" size={22} color="#15803D" />
+          <Text style={styles.headerTitle}>Statistik Keuangan</Text>
+        </View>
+
+        <View style={{ width: 32 }} />
       </View>
 
-      {/* BANNER SALDO */}
+      <View style={styles.filterContainer}>
+        <TouchableOpacity
+          style={[styles.filterTab, selectedPeriod === "all" && styles.activeFilterTab]}
+          onPress={() => setSelectedPeriod("all")}
+        >
+          <Text style={[styles.filterText, selectedPeriod === "all" && styles.activeFilterText]}>
+            Semua
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.filterTab, selectedPeriod === "month" && styles.activeFilterTab]}
+          onPress={() => setSelectedPeriod("month")}
+        >
+          <Text style={[styles.filterText, selectedPeriod === "month" && styles.activeFilterText]}>
+            Bulan Ini
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.filterTab, selectedPeriod === "week" && styles.activeFilterTab]}
+          onPress={() => setSelectedPeriod("week")}
+        >
+          <Text style={[styles.filterText, selectedPeriod === "week" && styles.activeFilterText]}>
+            Minggu Ini
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.bannerCard}>
         <Text style={styles.bannerLabel}>Total Saldo Saat Ini</Text>
         <Text style={styles.bannerAmount}>{formatRupiah(netBalance)}</Text>
         <Text style={styles.bannerDescription}>
-          {netBalance >= 0
-            ? "Kondisi Keuangan Stabil"
-            : "Pengeluaran Melebihi Pemasukan"}
+          {netBalance >= 0 ? "Kondisi Keuangan Stabil" : "Pengeluaran Melebihi Pemasukan"}
         </Text>
       </View>
 
-      {/* PEMASUKAN & PENGELUARAN */}
       <View style={styles.statsGrid}>
         <View style={styles.statCard}>
           <View style={styles.statHeader}>
             <Ionicons name="arrow-up-circle" size={20} color="#15803D" />
             <Text style={styles.statLabel}>Pemasukan</Text>
           </View>
-          <Text style={styles.incomeValue}>{formatRupiah(totalIncome)}</Text>
+          <Text style={styles.incomeValue}>{formatRupiah(incomeTotal)}</Text>
         </View>
 
         <View style={styles.statCard}>
@@ -115,19 +163,20 @@ export default function ReportsScreen() {
             <Ionicons name="arrow-down-circle" size={20} color="#DC2626" />
             <Text style={styles.statLabel}>Pengeluaran</Text>
           </View>
-          <Text style={styles.expenseValue}>{formatRupiah(totalExpense)}</Text>
+          <Text style={styles.expenseValue}>{formatRupiah(expenseTotal)}</Text>
         </View>
       </View>
 
-      {/* PENGELUARAN PER KATEGORI */}
       <Text style={styles.sectionTitle}>Pengeluaran per Kategori</Text>
-
-      {/* LOOP .MAP() (Modul 1 Subbab 5.4.A) */}
       <View style={styles.categoryList}>
         {categoryEntries.map(([category, amount], index) =>
-          renderCategoryCard(category, amount, index),
+          renderCategoryCard(category, amount, index)
         )}
       </View>
+
+      <Pressable style={styles.actionButton} onPress={handleOpenTransactions}>
+        <Text style={styles.actionButtonText}>Lihat Detail Transaksi ➔</Text>
+      </Pressable>
     </ScrollView>
   );
 }

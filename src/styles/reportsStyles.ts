@@ -12,13 +12,47 @@ export const styles = StyleSheet.create({
   headerArea: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    justifyContent: "space-between",
     marginBottom: 16,
+  },
+  headerTitleGroup: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  backButton: {
+    padding: 6,
+    borderRadius: 8,
+    backgroundColor: "#E2E8F0",
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#0F172A",
+  },
+  filterContainer: {
+    flexDirection: "row",
+    backgroundColor: "#E2E8F0",
+    borderRadius: 10,
+    padding: 4,
+    marginBottom: 16,
+  },
+  filterTab: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: "center",
+    borderRadius: 8,
+  },
+  activeFilterTab: {
+    backgroundColor: "#FFFFFF",
+  },
+  filterText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#64748B",
+  },
+  activeFilterText: {
+    color: "#15803D",
   },
   bannerCard: {
     backgroundColor: "#15803D",
@@ -81,7 +115,7 @@ export const styles = StyleSheet.create({
   },
   categoryList: {
     gap: 12,
-    paddingBottom: 24,
+    paddingBottom: 20,
   },
   categoryCard: {
     backgroundColor: "#FFFFFF",
@@ -112,6 +146,11 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#0F172A",
   },
+  percentageText: {
+    fontSize: 12,
+    color: "#64748B",
+    fontWeight: "400",
+  },
   progressBackground: {
     height: 6,
     backgroundColor: "#F1F5F9",
@@ -122,5 +161,17 @@ export const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: "#15803D",
     borderRadius: 3,
+  },
+  actionButton: {
+    backgroundColor: "#15803D",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  actionButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    fontSize: 14,
   },
 });
