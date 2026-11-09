@@ -70,6 +70,12 @@ export const styles = StyleSheet.create({
     color: "#FFFFFF",
     marginVertical: 4,
   },
+  bannerConvertedAmount: {
+    fontSize: 14,
+    color: "#DCFCE7",
+    marginBottom: 8,
+    fontWeight: "600",
+  },
   bannerDescription: {
     fontSize: 12,
     color: "#DCFCE7",
@@ -174,4 +180,5 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 14,
   },
+  
 });
