@@ -33,3 +33,12 @@ export interface DemoProfile {
   displayName: string;
   email: string;
 }
+
+export interface ExchangeRateResponse {
+  result: string;
+  base_code: string;
+  rates: {
+    IDR: number;
+  };
+  time_last_update_utc: string;
+}
