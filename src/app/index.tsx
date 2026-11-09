@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   Pressable,
@@ -21,9 +22,36 @@ import {
 } from "../data/demoData";
 
 import { styles } from "../styles/HomeStyle";
+import { fetchExchangeRate } from "../services/currencyService";
+import type { ExchangeRateResponse } from "../types/finance";
 
 export default function HomeScreen() {
   const [showBalance, setShowBalance] = useState(true);
+
+  // State untuk menyimpan data API kurs pada Landing Page.
+  const [exchangeRate, setExchangeRate] = useState<ExchangeRateResponse | null>(null);
+  const [loadingRate, setLoadingRate] = useState<boolean>(true);
+  const [rateError, setRateError] = useState<string | null>(null);
+
+  // Custom async function untuk mengambil kurs USD ke IDR.
+  const loadExchangeRate = useCallback(async (): Promise<void> => {
+    try {
+      setLoadingRate(true);
+      setRateError(null);
+      const data = await fetchExchangeRate("USD");
+      setExchangeRate(data);
+    } catch (error) {
+      setRateError(
+        typeof error === "string" ? error : "Gagal memuat informasi kurs."
+      );
+    } finally {
+      setLoadingRate(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadExchangeRate();
+  }, [loadExchangeRate]);
 
   const income = getTotalIncome();
   const expense = getTotalExpense();
@@ -157,6 +185,75 @@ export default function HomeScreen() {
               {formatRupiah(expense)}
             </Text>
           </View>
+        </View>
+
+        {/* INFORMASI KURS DARI EXTERNAL API */}
+        <View
+          style={{
+            backgroundColor: "#EFF6FF",
+            borderRadius: 16,
+            padding: 16,
+            marginBottom: 28,
+            borderWidth: 1,
+            borderColor: "#BFDBFE",
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 8,
+            }}
+          >
+            <Text style={{ color: "#1D4ED8", fontSize: 14, fontWeight: "700" }}>
+              Informasi Kurs Mata Uang
+            </Text>
+            <Pressable
+              onPress={loadExchangeRate}
+              disabled={loadingRate}
+              accessibilityRole="button"
+              accessibilityLabel="Muat ulang kurs mata uang"
+            >
+              <Ionicons name="refresh-outline" size={20} color="#1D4ED8" />
+            </Pressable>
+          </View>
+
+          <Text style={{ color: "#475569", fontSize: 12, marginBottom: 8 }}>
+            Data langsung dari External API (USD ke IDR)
+          </Text>
+
+          {loadingRate ? (
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <ActivityIndicator size="small" color="#2563EB" />
+              <Text style={{ color: "#475569", fontSize: 13 }}>
+                Mengambil data kurs...
+              </Text>
+            </View>
+          ) : rateError ? (
+            <View>
+              <Text style={{ color: "#B91C1C", fontSize: 13, marginBottom: 8 }}>
+                {rateError}
+              </Text>
+              <Pressable onPress={loadExchangeRate}>
+                <Text style={{ color: "#1D4ED8", fontWeight: "700", fontSize: 13 }}>
+                  Coba lagi
+                </Text>
+              </Pressable>
+            </View>
+          ) : (
+            <Text style={{ color: "#1E40AF", fontSize: 20, fontWeight: "800" }}>
+              1 USD ={" "}
+              {exchangeRate?.rates?.IDR
+                ? formatRupiah(exchangeRate.rates.IDR)
+                : "-"}
+            </Text>
+          )}
+          {exchangeRate?.time_last_update_utc ? (
+            <Text style={{ color: "#64748B", fontSize: 10, marginTop: 6 }}>
+              Pembaruan: {exchangeRate.time_last_update_utc}
+            </Text>
+          ) : null}
         </View>
 
         {/* TRANSAKSI TERBARU */}
