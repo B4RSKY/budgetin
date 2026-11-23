@@ -1,0 +1,30 @@
+export const colors = {
+  primary: "#15803D",
+  primaryDark: "#166534",
+  primarySoft: "#DCFCE7",
+  primaryTint: "#F0FDF4",
+  background: "#F8FAFC",
+  surface: "#FFFFFF",
+  surfaceMuted: "#F1F5F9",
+  textPrimary: "#0F172A",
+  textSecondary: "#475569",
+  textMuted: "#64748B",
+  border: "#E2E8F0",
+  success: "#15803D",
+  successSoft: "#DCFCE7",
+  danger: "#DC2626",
+  dangerSoft: "#FEE2E2",
+  warning: "#B45309",
+  warningSoft: "#FEF3C7",
+  info: "#0369A1",
+  infoSoft: "#E0F2FE",
+} as const;
+export const spacing = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
+  xxl: 32,
+} as const;
+export const radius = { input: 12, button: 12, card: 16 } as const;
